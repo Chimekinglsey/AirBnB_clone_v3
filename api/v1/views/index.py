@@ -1,38 +1,38 @@
 #!/usr/bin/python3
-"""
-    Blueprint to all ALX Headache
-"""
+"""The index folder package"""
 
-from api.v1.views import app_views
 from flask import jsonify
+from api.v1.views import app_views
 from models import storage
+from models.amenity import Amenity
+from models.place import Place
+from models.user import User
+from models.state import State
+from models.review import Review
+from models.city import City
 
 
 @app_views.route('/status')
 def status():
-    """returns status ok"""
-    return jsonify({"status": "OK"})
+    """Return the status of the page"""
+    status = {
+            'status': 'OK'
+            }
+    return jsonify(status)
 
 
-@app_views.route('/api/v1/stats')
-def count_objects():
-    """retrieves all objects by classes"""
-    try:
-        stats = {}
-        classes = ['Amenity', 'City', 'Place', 'Review', 'State', 'User']
-        for cls_name in classes:
-            cls = storage.classes.get(cls_name)
-            print(cls)
-            count = storage.count(cls)
-            print(count)
-            stats[cls_name.lower()] = count
-
-        # Modify the keys to convert singular to plural
-        for key, val in stats.items():
-            if key.endswith('y'):
-                stats[key[:-1] + 'ies'] = stats.pop(key)
-            else:
-                stats[key + 's'] = stats.pop(key)
-    except Exception as e:
-        print(e)
-    return jsonify(stats)
+@app_views.route('/stats')
+def list_counnt():
+    """Return the number of each objects in database"""
+    objects = {
+            'amenities': Amenity,
+            'cities': City,
+            'places': Place,
+            'reviews': Review,
+            'states': State,
+            'users': User
+            }
+    my_dict = {}
+    for key, value in objects.items():
+        my_dict[key] = storage.count(value)
+    return jsonify(my_dict)
